@@ -1,0 +1,76 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.2'
+	id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+	id 'java'
+	id 'org.seasar.doma.compile' version '1.1.0'
+}
+
+group = 'com.springvue'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	domaGenRuntime
+}
+
+repositories {
+	mavenCentral()
+	maven{url 'https://oss.sonatype.org/content/repositories/snapshots'}
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+}
+
+processResources.destinationDir = compileJava.destinationDir
+compileJava.dependsOn processResources
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'javax.validation:validation-api:2.0.1.Final'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-jdbc
+	implementation 'org.apache.tomcat:tomcat-jdbc:10.1.0-M16'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc:2.5.8'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.1'
+	
+	// https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+	//Domaのインストール
+	// https://mvnrepository.com/artifact/org.seasar.doma/doma
+	implementation 'org.seasar.doma:doma:2.29.0'
+	implementation 'org.seasar.doma.boot:doma-spring-boot-starter:1.4.0'
+	annotationProcessor 'org.seasar.doma:doma-processor:2.35.0'
+	// https://mvnrepository.com/artifact/org.seasar.doma/doma-core
+	runtimeOnly 'org.seasar.doma:doma-core:2.35.0'
+	// https://mvnrepository.com/artifact/org.seasar.doma/doma-processor
+	implementation 'org.seasar.doma:doma-processor:2.51.1'
+	
+	domaGenRuntime 'org.seasar.doma:doma-gen:2.6.1'
+	domaGenRuntime 'org.postgresql:postgresql:9.3-1100-jdbc41'
+}
+
+task gen{
+	group = 'doma-gen'
+	doLast{
+		ant.taskdef(resource: 'domagentask.properties',
+			classpath: configurations.domaGenRuntime.asPath)
+		ant.gen(url: 'jdbc:postgresql://localhost:5432/omikuji', user: 'root', password: '1005'){
+			entityConfig(destDir: 'src/main/java', packageName: 'com.springvue.Entity')
+			daoConfig(destDir: 'src/main/java', packageName: 'com.springvue.Dao')
+			sqlConfig(destDir: 'src/main/resources')
+		}
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
