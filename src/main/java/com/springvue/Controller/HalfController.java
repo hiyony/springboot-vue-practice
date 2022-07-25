@@ -28,6 +28,7 @@ import com.springvue.Service.UnseiresultServiceImpl;
  * @version 1.0
  */
 @Controller
+@RequestMapping(value="/vue/")
 public class HalfController {
 
 	/** サービス処理クラス */
@@ -43,7 +44,7 @@ public class HalfController {
 	 * @param request レクエスと
 	 * @return html画面
 	 */
-	@RequestMapping(value="/half", method=RequestMethod.POST)
+	@RequestMapping(value="/half/view", method=RequestMethod.POST)
 	public String half(Model model, HttpServletRequest request) {
 		
 //		HttpSession session = request.getSession();
